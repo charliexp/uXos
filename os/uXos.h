@@ -323,9 +323,10 @@ extern volatile TICK  			sysTick;
 struct TASK*   create_task(uXOS_THREAD((*lpTask )), BYTE pri  );
 void           os_init( void (*cb)(void) );
 void           os_start(void);
-BYTE 		   set_task_pri( struct TASK *t, BYTE pri );
-BYTE 		   get_task_pri( struct TASK *t );     
+BYTE 		       set_task_pri( struct TASK *t, BYTE pri );
+BYTE 		       get_task_pri( struct TASK *t );     
 struct TASK*   get_curr_task(void);
+void           os_set_tmr_cb( void (*cb)(void) );
 ///////////////////////////////////////////////////////////////////////////
 #include "uTimer.h"
 #include "eTimer.h"		

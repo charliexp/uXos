@@ -20,11 +20,12 @@
 
 ///////////////////////////////////////////////////////////////////////////
 LIST( tasklist );
-MEMB( taskblks, struct TASK, MAX_TASK_NUM+1 );
+MEMB( taskblks, struct TASK, MAX_TASK_NUM );
 
 ///////////////////////////////////////////////////////////////////////////
 volatile TICK  sysTick;
 static struct  TASK  *curr_task;		 
+static   void (*tmrCallback)( void ) = NULL;
 static   void (*sysCallback)( void );
 static   void  scheduler(void);
 
@@ -150,6 +151,19 @@ struct TASK* get_curr_task(void)
 }
 /*************************************************************************\
  *                                                                       *
+ *   Function name   : XOSCBInit                                         *
+ *   Returns         : void                                              *
+ *   Parameters      : callback function                                 *
+ *   Purpose         : set callback                                      *
+ *                                                                       *
+\*************************************************************************/
+void os_set_tmr_cb( void (*cb)(void) )
+{
+    tmrCallback = cb;
+}
+
+/*************************************************************************\
+ *                                                                       *
  *   Function name   : scheduler                                         *
  *   Returns         : NONE                                              *
  *   Parameters      : NONE                                              *
@@ -166,6 +180,10 @@ void scheduler(void)
     {
         sysCallback();
     }
+		if( tmrCallback )
+		{
+			  tmrCallback();
+		}
 	
     t = curr_task;
 	

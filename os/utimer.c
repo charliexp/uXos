@@ -196,26 +196,6 @@ static void utimer_tick( void )
 
 /*************************************************************************\
  *                                                                       *
- *   Function name   : uXOS_THREAD( utimer_process )                     *
- *   Returns         : NONE                                              *
- *   Parameters      : NONE                                              *
- *   Purpose         :                                                   *
- *                                                                       *
-\*************************************************************************/
-uXOS_THREAD( __sys_utimer__ )
-{
-	uXOS_BEGIN();
-	
-	while(1)
-    {
-        utimer_tick();      
-		uXOS_YIELD(); 								
-    }
-	uXOS_END();
-}
-
-/*************************************************************************\
- *                                                                       *
  *   Function name   : utimer_init                                       *
  *   Returns         : NONE                                              *
  *   Parameters      : NONE                                              *
@@ -226,7 +206,7 @@ void utimer_init(void)
 {
 	list_init( timerlist );
 	memb_init( &utimerblks );
-	create_task( __sys_utimer__, 1 );
+	os_set_tmr_cb( utimer_tick );
 }
 
 /*************************************************************************\
