@@ -91,12 +91,20 @@ struct TASK* create_task( uXOS_THREAD((*lpTask )),BYTE pri )
 {
 	struct TASK *t;
     
+	for( t = (struct TASK*)list_head(tasklist); t != NULL; t = (struct TASK*)list_item_next(t) ) 
+	{
+		if( t->pTask == lpTask )
+		{
+			return t;
+		}
+	}
+	
 	t = (struct TASK*)memb_alloc( &taskblks );
     
     t->pTask = lpTask;   
     t->pri   = pri; 
 	uPT_INIT( &t->pt );
-    list_remove( tasklist, t );
+   // list_remove( tasklist, t );
 	list_add( tasklist, t );
 
     return t;
