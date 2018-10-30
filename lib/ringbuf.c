@@ -107,7 +107,7 @@ WORD ringbuf_size( struct ringbuf *r )
 \*************************************************************************/
 WORD ringbuf_elements( struct ringbuf *r )
 {
-	return r->put_ptr - r->get_ptr;
+	return (r->put_ptr - r->get_ptr);
 }
 
 /*************************************************************************\

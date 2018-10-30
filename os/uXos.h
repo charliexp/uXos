@@ -17,7 +17,7 @@
 #ifndef __UXOS_H__
 #define __UXOS_H__
 
-#include "config.h"
+#include "osconfig.h"
 #include "os/opt.h"
 
 ///////////////////////////////////////////////////////////////////////////

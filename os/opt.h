@@ -53,8 +53,8 @@ typedef  BYTE                       HANDLE;
 #endif
 
 #ifndef  TICK
-#define  TICK 						unsigned long
-#define  STICK   			        long
+#define  TICK 						unsigned int
+#define  STICK   			        int
 #endif
 #define  ENTER_CRITICAL_SECTION()
 #define  EXIT_CRITICAL_SECTION()

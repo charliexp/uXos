@@ -33,7 +33,7 @@ MEMB( utimerblks, struct uTimer, TIMER_NUMBER );
 \*************************************************************************/
 static void utimer_insert( struct uTimer **timer )
 {
-	struct uTimer *t,*l,*r = NULL;
+	struct uTimer *t,*l,*p,*r = NULL;
 	
     t = *timer;	
 	
@@ -53,11 +53,12 @@ static void utimer_insert( struct uTimer **timer )
 		{
 			r = l;
 		}
+		if( l->next == NULL ) p = l;
 	}
-    //list_add( timerlist, t );	//优化效率
 	t->next = NULL;
-	l->next = t;	
+	p->next = t;	
 }
+
 /*************************************************************************\
  *                                                                       *
  *   Function name   : utimer_create                                     *
@@ -70,6 +71,14 @@ struct uTimer* utimer_create( void (*cb)(void), TICK timeout, BYTE option )
 {
 	struct uTimer *t;
 	
+	for( t = (struct uTimer*)list_head(timerlist); t != NULL; t = (struct uTimer*)t->next )
+	{
+		if( t->callback == cb )
+		{
+			return t;
+		}
+	}
+    
 	t = (struct uTimer*)memb_alloc( &utimerblks );
 
 	t->interval = timeout;

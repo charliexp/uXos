@@ -16,7 +16,7 @@
 #ifndef __ETIMER_H__
 #define __ETIMER_H__
 
-#include "config.h"
+#include "osconfig.h"
 #include "os/opt.h"
 
 ///////////////////////////////////////////////////////////////////////////
