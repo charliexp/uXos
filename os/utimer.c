@@ -31,9 +31,37 @@ MEMB( utimerblks, struct uTimer, TIMER_NUMBER );
  *   Purpose         :                                                   *
  *                                                                       *
 \*************************************************************************/
+/*
 static void utimer_insert( struct uTimer **timer )
 {
-	struct uTimer *t,*l,*p,*r = NULL;
+	struct uTimer *t,*l,*r = NULL;
+	
+    t = *timer;	
+	
+	if( list_head( timerlist ) == NULL )
+	{
+		list_push( timerlist, t );	
+		return;
+	}
+	for( l = (struct uTimer*)list_head(timerlist); l != NULL; l = (struct uTimer*)l->next )
+	{
+		if( (STICK)(t->curr_tick - l->curr_tick) <= 0 )
+		{
+			list_insert( timerlist, r, t );
+			return;
+		}
+		else
+		{
+			r = l;
+		}
+	}
+    list_add( timerlist, t );	//优化效率
+	t->next = NULL;
+}
+*/
+static void utimer_insert( struct uTimer **timer )
+{
+	struct uTimer *t,*l,*p = NULL,*r = NULL;
 	
     t = *timer;	
 	
@@ -56,7 +84,7 @@ static void utimer_insert( struct uTimer **timer )
 		if( l->next == NULL ) p = l;
 	}
 	t->next = NULL;
-	p->next = t;	
+	p->next = t;
 }
 
 /*************************************************************************\
@@ -71,7 +99,7 @@ struct uTimer* utimer_create( void (*cb)(void), TICK timeout, BYTE option )
 {
 	struct uTimer *t;
 	
-	for( t = (struct uTimer*)list_head(timerlist); t != NULL; t = (struct uTimer*)t->next )
+	for( t = list_head(timerlist); t != NULL; t = t->next )
 	{
 		if( t->callback == cb )
 		{
@@ -142,19 +170,27 @@ void utimer_ctrl(struct uTimer *timer, BYTE cmd, void* arg)
     switch (cmd)
     {
 		case TIMER_CTRL_GET_TIME:
+
 			*(TICK *)arg = timer->interval;
 			break;
 
 		case TIMER_CTRL_SET_TIME:
+
+			utimer_stop(timer);
 			timer->interval = *(TICK *)arg;
+			utimer_start(timer);
 			break;
 
 		case TIMER_CTRL_SET_ONESHOT:
+
 			timer->cfg &= ~UTIMER_PERIODIC;
 			break;
 
 		case TIMER_CTRL_SET_PERIODIC:
+
+			utimer_stop(timer);
 			timer->cfg |= UTIMER_PERIODIC;
+			utimer_start(timer);
 			break;
 	}
 }
