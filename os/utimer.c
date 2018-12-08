@@ -31,34 +31,6 @@ MEMB( utimerblks, struct uTimer, TIMER_NUMBER );
  *   Purpose         :                                                   *
  *                                                                       *
 \*************************************************************************/
-/*
-static void utimer_insert( struct uTimer **timer )
-{
-	struct uTimer *t,*l,*r = NULL;
-	
-    t = *timer;	
-	
-	if( list_head( timerlist ) == NULL )
-	{
-		list_push( timerlist, t );	
-		return;
-	}
-	for( l = (struct uTimer*)list_head(timerlist); l != NULL; l = (struct uTimer*)l->next )
-	{
-		if( (STICK)(t->curr_tick - l->curr_tick) <= 0 )
-		{
-			list_insert( timerlist, r, t );
-			return;
-		}
-		else
-		{
-			r = l;
-		}
-	}
-    list_add( timerlist, t );	//优化效率
-	t->next = NULL;
-}
-*/
 static void utimer_insert( struct uTimer **timer )
 {
 	struct uTimer *t,*l,*p = NULL,*r = NULL;
@@ -97,14 +69,22 @@ static void utimer_insert( struct uTimer **timer )
 \*************************************************************************/
 struct uTimer* utimer_create( void (*cb)(void), TICK timeout, BYTE option )
 {
-	struct uTimer *t;
-	
+	struct uTimer *t, *r;
+
+	r = NULL;
 	for( t = list_head(timerlist); t != NULL; t = t->next )
 	{
 		if( t->callback == cb )
 		{
+			if( r == NULL )
+				*timerlist = t->next;   
+			else
+				r->next = t->next; 
+			t->next = NULL;
+			t->cfg &= (BYTE)~UTIMER_EN;
 			return t;
 		}
+		r = t;
 	}
     
 	t = (struct uTimer*)memb_alloc( &utimerblks );
@@ -205,7 +185,6 @@ void utimer_ctrl(struct uTimer *timer, BYTE cmd, void* arg)
 \*************************************************************************/
 static void utimer_tick( void )
 {
-	struct uTimer  *t;
 	struct uTimer  *l;
 	
 	l = (struct uTimer*)list_head(timerlist);
@@ -222,18 +201,17 @@ static void utimer_tick( void )
 				l->callback();
 			
 			if( l->cfg & UTIMER_PERIODIC )
-			{
+			{			
+				l = list_pop( timerlist );
 				l->curr_tick = get_tick()+l->interval;
-                t = list_item_next(l);
-				list_remove( timerlist, l );
 				utimer_insert( &l );
-                l = t;
+                l = list_head( timerlist );				
 			}
 			else
 			{
-				t = list_item_next(l);
-				utimer_delete(l);
-				l = t;
+				l = list_pop( timerlist );
+				memb_free( &utimerblks, l );
+                l = list_head( timerlist );	
 			}
 		}	
 	}
