@@ -200,19 +200,17 @@ static void utimer_tick( void )
 			if( l->callback )
 				l->callback();
 			
+			l = list_pop( timerlist );
 			if( l->cfg & UTIMER_PERIODIC )
 			{			
-				l = list_pop( timerlist );
 				l->curr_tick = get_tick()+l->interval;
-				utimer_insert( &l );
-                l = list_head( timerlist );				
+				utimer_insert( &l );            		
 			}
 			else
 			{
-				l = list_pop( timerlist );
 				memb_free( &utimerblks, l );
-                l = list_head( timerlist );	
 			}
+			l = list_head( timerlist );	
 		}	
 	}
 }	
